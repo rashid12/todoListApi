@@ -4,11 +4,16 @@ var mongoose = require('mongoose'),
   Task = mongoose.model('Tasks');
 
 exports.list_all_tasks = function(req, res) {
-  Task.find({}, function(err, task) {
-    if (err)
-      res.send(err);
-    res.json(task);
-  });
+  const page = parseInt(req.query.page)
+  const limit = parseInt(req.query.limit)
+  Task.find()
+    .skip((page-1) * limit)
+    .limit(limit)
+    .exec(function(err, task) {
+      if (err)
+        res.send(err);
+      res.json(task);
+    });
 };
 
 exports.create_a_task = function(req, res) {
