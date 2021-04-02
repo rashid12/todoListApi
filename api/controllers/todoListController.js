@@ -3,18 +3,16 @@
 var mongoose = require('mongoose'),
   Task = mongoose.model('Tasks');
 
-exports.list_all_tasks = function(req, res) {
-  const page = parseInt(req.query.page)
-  const limit = parseInt(req.query.limit)
-  Task.find()
-    .skip((page-1) * limit)
-    .limit(limit)
-    .exec(function(err, task) {
-      if (err)
-        res.send(err);
-      res.json(task);
-    });
-};
+exports.list_all_tasks = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  try{
+    const paginatedResult = await Task.find().skip((page-1) * limit).limit(limit)
+    res.json(paginatedResult)
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error."})
+  }
+}
 
 exports.create_a_task = function(req, res) {
   var new_task = new Task(req.body);
